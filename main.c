@@ -4,6 +4,7 @@ int main(int argc, char *argv[]) {
     //Variável auxiliar
     GtkWidget *window;
     GtkWidget *janela_logo; //Adicionando uma váriavel auxiliar para logo
+    GtkWidget *fixed; 
 
     //Variáveis para mexer na memória da imagem;
     GdkPixbuf *imagem_original;
@@ -25,7 +26,8 @@ int main(int argc, char *argv[]) {
         g_print("Erro ao carregar a imagem");
         g_error_free(erro);
     }else{
-        imagem_redimensionada = gdk_pixbuf_scale_simple(imagem_original, 250, 120, GDK_INTERP_BILINEAR);
+        imagem_redimensionada = gdk_pixbuf_scale_simple(imagem_original, 120, 60, GDK_INTERP_BILINEAR);
+        fixed = gtk_fixed_new();
         janela_logo = gtk_image_new_from_pixbuf(imagem_redimensionada);
 
         //Limpar os pixbufs da memória, importante para não tracar o PC!
@@ -33,6 +35,8 @@ int main(int argc, char *argv[]) {
         g_object_unref(imagem_redimensionada);
 
         //Adicionar a imagem redimensionada na tela
+        gtk_container_add(GTK_CONTAINER(window), fixed);
+        gtk_fixed_put(GTK_FIXED(fixed), janela_logo, 20, 530);
         gtk_container_add(GTK_CONTAINER(window), janela_logo);
     }
 
