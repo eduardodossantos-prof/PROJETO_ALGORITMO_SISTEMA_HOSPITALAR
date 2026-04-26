@@ -6,6 +6,7 @@ Figma: https://www.figma.com/design/MoDEiXouSpepjeo4HzHMbS/Sem-t%C3%ADtulo?node-
 # PROGRAMAÇÃO API: 
 
 GTK - Interface Gráfica
+
 C - Back-End
 
 - Fila Prioridade Circular (Eduardo);
