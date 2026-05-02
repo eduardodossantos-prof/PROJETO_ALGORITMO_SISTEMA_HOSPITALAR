@@ -1,0 +1,15 @@
+Pesquisando melhor vi que era mais interessante fazer a arvore primeiro de cabeça pra baixo, ou seja, criando as folhas primeiro e dps criando a raiz(que nesse caso seria a pergunta). Dessa forma, a primeira raiz seria a pergunta mais importante, que se o usuario digitar 1 ele ja vai precisar ser atendido com urgencia.
+
+Além disso, olhei melhor sobre a questão da fila, a fila seria uma fila simplesmente encadeada com prioridade, os que estão com urgencia ficam na frente.
+
+Na fila consistiria de encadear cada paciente que passou pela triagem na arvore e ir empilhando na fila.
+Ápos ele ser atendido sairia da fila.
+
+Pra fazer o Historico seria preciso uma pilha dps da fila, pois sairia mais "barato".
+
+já que a pilha vai pegar o primeira que foi atendido e jogar na fila, mostrando o Historico
+
+se fosse usar a fila sozinha teria que percorrer até o inicio pra pegar a cabeça da fila e jogar na pilha
+
+Parece que a ideia da fila circular tbm nao resolve esse problema, dps tu da uma olhada
+
