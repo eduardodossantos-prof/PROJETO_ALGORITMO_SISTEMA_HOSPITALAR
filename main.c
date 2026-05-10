@@ -8,11 +8,27 @@ gboolean desenhar_quadrado(GtkWidget *widget, cairo_t *cr, gpointer data)
     return FALSE;
 }
 
+GtkWidget* criar_modulo_triagem(){
+    GtkWidget *rectangle_information;
+    GtkWidget *fixed;
+
+    fixed = gtk_fixed_new();
+   
+    rectangle_information = gtk_drawing_area_new();
+    gtk_widget_set_size_request (rectangle_information, 200, 2000);
+    g_signal_connect(rectangle_information, "draw", G_CALLBACK(desenhar_quadrado), NULL);
+    
+    gtk_fixed_put(GTK_FIXED(fixed), rectangle_information, 80,180);
+
+    return fixed;
+}
+
 int main(int argc, char *argv[]) {
   
     GtkWidget *window;
     GtkWidget *janela_logo; 
     GtkWidget *fixed; 
+    GtkWidget *tela_triagem;
     GtkWidget *area_desenho;
     GtkWidget *area_desenho_2;
     GtkWidget *area_desenho_3;
@@ -66,6 +82,10 @@ int main(int argc, char *argv[]) {
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho, 80, 180);
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho_2, 430, 180);
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho_3, 780, 180);
+
+    tela_triagem = criar_modulo_triagem();
+
+    gtk_container_add(GTK_CONTAINER(window), tela_triagem);
 
     gtk_widget_show_all(window);
 
