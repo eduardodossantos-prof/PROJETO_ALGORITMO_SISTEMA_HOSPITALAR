@@ -3,9 +3,10 @@
 #include <string.h>
 #include "paciente.h"
 #include "arvore.h"
+#include "pilha.h"
 
-// Lê 's' ou 'n' do terminal e retorna 1 (sim) ou 0 (nao)
-int perguntar(const char *pergunta)
+    // Lê 's' ou 'n' do terminal e retorna 1 (sim) ou 0 (nao)
+    int perguntar(const char *pergunta)
 {
     char resp;
     while (1)
@@ -15,6 +16,7 @@ int perguntar(const char *pergunta)
         printf("     Resposta: \n");
         scanf(" %c", &resp); // lê a resposta do usuário para a pergunta atual, usando scanf para ler um caractere (a resposta) do terminal e armazená-la no buffer resp
         getchar();           // consome o \n que sobra após scanf
+
         if (resp == 's' || resp == 'S')
             return 1;
         if (resp == 'n' || resp == 'N')
@@ -23,6 +25,7 @@ int perguntar(const char *pergunta)
         printf("     [!] Digite apenas 's' ou 'n'\n");
     }
 }
+
 // Simplesmente para criar uma linha de caracteres para separar seções do terminal, melhorando a organização visual
 void linha(char c, int n)
 {
@@ -31,7 +34,8 @@ void linha(char c, int n)
     printf("\n");
 }
 
-void testar_triagem(Nodoarvore *raiz)
+// Retorna o paciente triado — NAO destrói aqui pois ele será empilhado no histórico
+Paciente *testar_triagem(Nodoarvore *raiz)
 {
     char nome[100];
     int idade;
@@ -88,7 +92,9 @@ void testar_triagem(Nodoarvore *raiz)
 
     linha('=', 50);
 
-    destruir_paciente(p);
+    // Retorna o paciente em vez de destruir
+    // quem chama decide o que fazer com ele — no caso, empilhar no histórico
+    return p;
 }
 
 int main(void)
@@ -99,6 +105,7 @@ int main(void)
     linha('=', 50);
 
     Nodoarvore *arvore = construir_arvore();
+    Pilha *historico = criar_pilha(); // histórico de atendimentos — pilha LIFO
 
     // 1) Mostra a arvore inteira para debug
     printf("\n  [DEBUG] Estrutura da arvore:\n\n");
@@ -109,14 +116,28 @@ int main(void)
     while (continuar == 's' || continuar == 'S')
     {
         printf("\n");
-        testar_triagem(arvore);
+
+        // Tria o paciente pela arvore e recebe ele de volta já classificado
+        Paciente *p = testar_triagem(arvore);
+
+        // Empilha no histórico simulando que foi atendido
+        // quando a fila estiver pronta, o paciente virá de remover_fila()
+        // e só então será empilhado aqui
+        empilhar(historico, p);
+        printf("\n  Paciente registrado no historico!\n");
+
+        // Mostra o historico atualizado após cada atendimento
+        printf("\n");
+        imprimir_pilha(historico);
 
         printf("\n  Triar outro paciente? [s/n]: ");
         scanf(" %c", &continuar);
         getchar(); // consome o \n que sobra após scanf
     }
 
+    // Libera toda a memória antes de encerrar
     destruir_arvore(arvore);
+    destruir_pilha(historico); // libera os nós da pilha e os pacientes dentro deles
 
     printf("\n  Programa encerrado. Memoria liberada.\n\n");
     return 0;
