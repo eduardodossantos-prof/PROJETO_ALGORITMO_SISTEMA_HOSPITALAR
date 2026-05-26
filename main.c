@@ -19,31 +19,55 @@ gboolean desenhar_quadrado_triagem(GtkWidget *widget, cairo_t *cr, gpointer data
 }
 
 GtkWidget* criar_modulo_triagem(){
-    GtkWidget *rectangle_information;
     GtkWidget *fixed;
     GtkWidget *titulo_triagem;
     GtkWidget *label_nome, *entry_name;
+    GtkWidget *label_rg, *entry_rg;
+    GtkWidget *label_cpf, *entry_cpf;
+    GtkWidget *label_data_de_nascimento, *entry_data_de_nascimento;
+    GtkWidget *label_descricao, *entry_descricao;
+    GtkWidget *label_classificao, *entry_classificacao;
 
     fixed = gtk_fixed_new();
-    rectangle_information = gtk_drawing_area_new();
     
     titulo_triagem = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(titulo_triagem), 
-        "<span face='Arial' size='20000' foreground='#000000'><b>Serviço de Atendimento Hospitalar</b></span>");
-    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 200, 40);
+    gtk_label_set_markup(GTK_LABEL(titulo_triagem),
+    "<span face='Arial' size='30000' foreground='#000000' ><b>Serviço de Atendimento Hospitalar</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 380, 60);
 
-    label_nome = gtk_label_new("Nome Completo: ");
-    gtk_fixed_put(GTK_FIXED(fixed), label_nome, 150, 150);
     entry_name = gtk_entry_new();
-    gtk_widget_set_size_request(entry_name, 500, -1);
-    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_name), "Ex: Eduardo dos Santos");
-    gtk_fixed_put(GTK_FIXED(fixed), entry_name, 250, 143);
+    gtk_widget_set_size_request(entry_name, 1000, -1);   
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_name), "NOME COMPLETO:");
+    gtk_fixed_put(GTK_FIXED(fixed), entry_name, 200, 143);
 
+    entry_rg = gtk_entry_new();
+    gtk_widget_set_size_request(entry_rg, 300, -1);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_rg), "RG:");
+    gtk_fixed_put(GTK_FIXED(fixed), entry_rg, 200, 200);
 
-    gtk_widget_set_size_request(rectangle_information, 1200, 300);
-    g_signal_connect(rectangle_information, "draw", G_CALLBACK(desenhar_quadrado_triagem), NULL);
-    gtk_fixed_put(GTK_FIXED(fixed), rectangle_information, 35, 10);
-    
+    entry_cpf = gtk_entry_new();
+    gtk_widget_set_size_request(entry_cpf, 300, -1);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_cpf), "CPF:");
+    gtk_fixed_put(GTK_FIXED(fixed), entry_cpf, 525, 200);
+
+    entry_data_de_nascimento = gtk_entry_new();
+    gtk_widget_set_size_request(entry_data_de_nascimento, 350, -1);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_data_de_nascimento), "DATA DE NASCIMENTO:");
+    gtk_fixed_put(GTK_FIXED(fixed), entry_data_de_nascimento, 850, 200);
+
+    entry_descricao = gtk_entry_new();
+    gtk_widget_set_size_request(entry_descricao, 1000, 200);  
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_descricao), "DESCRICAO:");
+    gtk_fixed_put(GTK_FIXED(fixed), entry_descricao, 200, 320);
+
+    entry_classificacao = gtk_combo_box_text_new();
+    gtk_widget_set_size_request(entry_classificacao, 1000, -1);
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry_classificacao), "Verde");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry_classificacao), "Amarelo");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry_classificacao), "Vermelho");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(entry_classificacao), 0);
+    gtk_fixed_put(GTK_FIXED(fixed), entry_classificacao, 200, 260);
+
     return fixed;
 }
 
@@ -71,6 +95,7 @@ int main(int argc, char *argv[]) {
 
     gtk_init(&argc, &argv);
     
+    //Criação da janela da Haba hospitalar.
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Sistema Hospitalar - Triagem");
     
@@ -86,7 +111,7 @@ int main(int argc, char *argv[]) {
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), 
         "<span face='Arial' size='30000' foreground='#000000'><b>SERVIÇO DE ATENDIMENTO HOSPITALAR</b></span>");
-    gtk_fixed_put(GTK_FIXED(fixed), label, 300, 50); // Subi um pouco o título (y=50)
+    gtk_fixed_put(GTK_FIXED(fixed), label, 300, 80); // Subi um pouco o título (y=50)
 
     imagem_original = gdk_pixbuf_new_from_file("univasf_logo.png", &erro);
 
@@ -101,7 +126,7 @@ int main(int argc, char *argv[]) {
         g_object_unref(imagem_redimensionada);
 
         // AJUSTE: Subi a logo para y=600 para garantir que fique visível na tela
-        gtk_fixed_put(GTK_FIXED(fixed), janela_logo, 20, 600);
+        gtk_fixed_put(GTK_FIXED(fixed), janela_logo, 20, 660);
     }
   
     area_desenho = gtk_drawing_area_new();
@@ -122,9 +147,9 @@ int main(int argc, char *argv[]) {
     g_signal_connect(area_desenho_3, "draw", G_CALLBACK(desenhar_quadrado), NULL);
 
     // Posicionando sem colisão (x=0, x=400, x=800)
-    gtk_fixed_put(GTK_FIXED(fixed), area_desenho, 0, 180);
-    gtk_fixed_put(GTK_FIXED(fixed), area_desenho_2, 400, 180);
-    gtk_fixed_put(GTK_FIXED(fixed), area_desenho_3, 800, 180);
+    gtk_fixed_put(GTK_FIXED(fixed), area_desenho, 90, 180);
+    gtk_fixed_put(GTK_FIXED(fixed), area_desenho_2, 440, 180);
+    gtk_fixed_put(GTK_FIXED(fixed), area_desenho_3, 790, 180);
 
     g_signal_connect(area_desenho, "button-press-event", G_CALLBACK(ao_clicar_no_quadrado), stack);
 
