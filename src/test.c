@@ -3,6 +3,8 @@
 #include <string.h>
 #include "paciente.h"
 #include "arvore.h"
+#include "fila.h"
+#include "pilha.h"
 
 // Lê 's' ou 'n' do terminal e retorna 1 (sim) ou 0 (nao)
 int perguntar(const char *pergunta)
@@ -13,8 +15,9 @@ int perguntar(const char *pergunta)
         printf("\n  >> %s\n", pergunta);
         printf("     [s] Sim    [n] Nao\n");
         printf("     Resposta: \n");
-        scanf(" %c", &resp); // lê a resposta do usuário para a pergunta atual, usando scanf para ler um caractere (a resposta) do terminal e armazená-la no buffer resp
+        scanf(" %c", &resp); // lê a resposta do usuário para a pergunta atual
         getchar();           // consome o \n que sobra após scanf
+
         if (resp == 's' || resp == 'S')
             return 1;
         if (resp == 'n' || resp == 'N')
@@ -23,7 +26,8 @@ int perguntar(const char *pergunta)
         printf("     [!] Digite apenas 's' ou 'n'\n");
     }
 }
-// Simplesmente para criar uma linha de caracteres para separar seções do terminal, melhorando a organização visual
+
+// Simplesmente para criar uma linha de caracteres para separar seções do terminal
 void linha(char c, int n)
 {
     for (int i = 0; i < n; i++)
@@ -31,7 +35,8 @@ void linha(char c, int n)
     printf("\n");
 }
 
-void testar_triagem(Nodoarvore *raiz)
+// Tria o paciente pela arvore e insere na fila — NAO destrói aqui
+void testar_triagem(Nodoarvore *raiz, Fila *fila)
 {
     char nome[100];
     int idade;
@@ -47,7 +52,7 @@ void testar_triagem(Nodoarvore *raiz)
 
     printf("  Idade : ");
     fflush(stdout);
-    scanf("%d", &idade); // aq como é só um número, não tem problema usar scanf
+    scanf("%d", &idade); // como é só um número, não tem problema usar scanf
     getchar();           // consome o \n que sobra após scanf
 
     Paciente *p = criar_paciente(nome, idade);
@@ -59,11 +64,11 @@ void testar_triagem(Nodoarvore *raiz)
     // Navega pela arvore respondendo as perguntas
     Nodoarvore *atual = raiz;
     int passo = 1;               // contador de perguntas para mostrar no terminal
-    while (atual->eh_folha == 0) // enquanto não chegar na folha, ou seja, enquanto for um nó de pergunta, continua perguntando e avançando na árvore
+    while (atual->eh_folha == 0) // enquanto for nó de pergunta, continua navegando
     {
         printf("\n  Pergunta %d:", passo++);
-        int resposta = perguntar(atual->pergunta); // lê a resposta do usuário para a pergunta atual, usando a função perguntar que retorna 1 para 's' e 0 para 'n'
-        atual = avancar_no(atual, resposta);       // avança para o próximo nó da árvore com base na resposta, usando a função avancar_no que retorna o nó filho correspondente à resposta dada
+        int resposta = perguntar(atual->pergunta); // retorna 1 para 's' e 0 para 'n'
+        atual = avancar_no(atual, resposta);       // avança para o filho correspondente
     }
 
     // Chegou na folha — aplica resultado ao paciente
@@ -82,41 +87,112 @@ void testar_triagem(Nodoarvore *raiz)
         cor = "+++ VERDE    - LEVE     +++";
 
     printf("\n  %s\n", cor);
-    printf("\n  Paciente    : %s, %d anos\n", p->nome, p->idade);
-    printf("  Prioridade  : %s\n", prioridade_para_string(p->prioridade));
+    printf("\n  Paciente     : %s, %d anos\n", p->nome, p->idade);
+    printf("  Prioridade   : %s\n", prioridade_para_string(p->prioridade));
     printf("  Justificativa: %s\n\n", p->justificativa);
 
     linha('=', 50);
 
-    destruir_paciente(p);
+    // Insere na fila no lugar certo por prioridade
+    inserir_fila(fila, p);
+    printf("\n  Paciente inserido na fila!\n");
+}
+
+// Atende o primeiro da fila e empilha no historico
+void atender_proximo(Fila *fila, Pilha *historico)
+{
+    if (fila_vazia(fila))
+    {
+        printf("\n  [AVISO] Fila vazia — nenhum paciente para atender\n");
+        return;
+    }
+
+    // Remove o primeiro da fila — o mais prioritário
+    Paciente *atendido = remover_fila(fila);
+
+    printf("\n  Atendendo: %s (%s)\n",
+           atendido->nome,
+           prioridade_para_string(atendido->prioridade));
+
+    // Empilha no historico
+    empilhar(historico, atendido);
+    printf("  Paciente registrado no historico!\n");
 }
 
 int main(void)
 {
     linha('=', 50);
     printf("  SISTEMA DE TRIAGEM HOSPITALAR\n");
-    printf("  Teste de arvore de decisao (terminal)\n");
+    printf("  Teste completo — arvore + fila + pilha\n");
     linha('=', 50);
 
+    // Inicializa todas as estruturas
     Nodoarvore *arvore = construir_arvore();
+    Fila *fila = criar_fila();        // sala de espera ordenada por prioridade
+    Pilha *historico = criar_pilha(); // histórico de atendimentos — LIFO
 
-    // 1) Mostra a arvore inteira para debug
+    // Debug da arvore
     printf("\n  [DEBUG] Estrutura da arvore:\n\n");
     imprimir_arvore(arvore, 2);
 
-    // 2) Loop de triagem — permite testar varios pacientes
-    char continuar = 's';
-    while (continuar == 's' || continuar == 'S')
+    char opcao = ' ';
+    while (opcao != 's' && opcao != 'S')
     {
         printf("\n");
-        testar_triagem(arvore);
-
-        printf("\n  Triar outro paciente? [s/n]: ");
-        scanf(" %c", &continuar);
+        linha('-', 50);
+        printf("  MENU\n");
+        linha('-', 50);
+        printf("  [1] Cadastrar e triar novo paciente\n");
+        printf("  [2] Atender proximo da fila\n");
+        printf("  [3] Ver fila atual\n");
+        printf("  [4] Ver historico de atendimentos\n");
+        printf("  [s] Sair\n");
+        printf("  Opcao: ");
+        scanf(" %c", &opcao);
         getchar(); // consome o \n que sobra após scanf
+
+        switch (opcao)
+        {
+        case '1':
+            printf("\n");
+            testar_triagem(arvore, fila);
+            printf("\n");
+            imprimir_fila(fila);
+            break;
+
+        case '2':
+            atender_proximo(fila, historico);
+            printf("\n");
+            imprimir_fila(fila);
+            printf("\n");
+            imprimir_pilha(historico);
+            break;
+
+        case '3':
+            printf("\n");
+            imprimir_fila(fila);
+            break;
+
+        case '4':
+            printf("\n");
+            imprimir_pilha(historico);
+            break;
+
+        case 's':
+        case 'S':
+            break;
+
+        default:
+            printf("\n  [!] Opcao invalida\n");
+            opcao = ' '; // reseta para continuar o loop
+            break;
+        }
     }
 
+    // Libera toda a memória antes de encerrar
     destruir_arvore(arvore);
+    destruir_fila(fila);       // libera pacientes que ainda estão na fila
+    destruir_pilha(historico); // libera pacientes do histórico
 
     printf("\n  Programa encerrado. Memoria liberada.\n\n");
     return 0;
