@@ -2,7 +2,7 @@
 # declaração das variáveis para o compilador, flags de compilação, arquivos fonte e teste
 CC     	= gcc
 CFLAGS  = -Wall -Wextra -g -Iinclude
-SRC     = src/paciente.c src/arvore.c src/pilha.c
+SRC     = src/paciente.c src/arvore.c src/fila.c src/pilha.c
 TEST    = src/test.c
  # Makefile é usado para compilar o programa de teste(alvo "test") e para limpar os arquivos compilados(alvo "clean")
  # aqui as variaveis são usadas para compilar o programa de teste, gerando um executável chamado "test_triagem"
