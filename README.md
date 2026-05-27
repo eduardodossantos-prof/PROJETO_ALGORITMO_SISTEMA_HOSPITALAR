@@ -5,17 +5,16 @@ Figma: https://www.figma.com/design/MoDEiXouSpepjeo4HzHMbS/Sem-t%C3%ADtulo?node-
 
 # PROGRAMAÇÃO API: 
 
-GTK - Interface Gráfica
+GTK - Interface Gráfica + Algoritmos e Estrutura de Dados
+C - Back-End and Front-End
 
-C - Back-End
-
-- Fila Prioridade Circular (Eduardo);
-- Arvore Binária de Busca (Hiago);
-- Interface do Programa (Figma);
+- Front-End (Eduardo + Figma);
+- Back-End (Hiago);
 
 Framework:
- - MakeFille
- - Figma
+ - MakeFille;
+ - Visual Studio Code;
+ - Figma;
 
 
 
