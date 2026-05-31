@@ -10,13 +10,16 @@ typedef struct Paciente
 {
     char nome[100];
     int idade;
-    int prioridade;          // usa as constantes acima
-    char justificativa[300]; // explicação do motivo da prioridade, preenchida após a triagem
-    struct Paciente *next;   // encadeamento da fila
+    char cpf[15];             // Ex: 000.000.000-00 (14 chars + 1)
+    char rg[15];              // Ex: 00.000.000-0 (12 chars + 1)
+    char data_nascimento[11]; // Ex: 31/12/1999 (10 chars + 1)
+    int prioridade;           // usa as constantes acima
+    char justificativa[300];  // explicação do motivo da prioridade, preenchida após a triagem
+    struct Paciente *next;    // encadeamento da fila
 } Paciente;
 
 // isso aq vai ser exclusivamente pra debugar o codigo, não é necessário para a implementação da fila de pacientes mas é útil para verificar se os dados estão sendo armazenados corretamente
-Paciente *criar_paciente(const char *nome, int idade);
+Paciente *criar_paciente(const char *nome, int idade, const char *cpf, const char *rg, const char *data_nascimento);
 void destruir_paciente(Paciente *p);
 // Debug
 void imprimir_paciente(const Paciente *p);

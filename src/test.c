@@ -40,6 +40,9 @@ void testar_triagem(Nodoarvore *raiz, Fila *fila)
 {
     char nome[100];
     int idade;
+    char cpf[15];             // Ex: 000.000.000-00 (14 chars + 1)
+    char rg[15];              // Ex: 00.000.000-0 (12 chars + 1)
+    char data_nascimento[11]; // Ex: 31/12/1999 (10 chars + 1)
 
     linha('=', 50);
     printf("  CADASTRO DO PACIENTE\n");
@@ -55,7 +58,22 @@ void testar_triagem(Nodoarvore *raiz, Fila *fila)
     scanf("%d", &idade); // como é só um número, não tem problema usar scanf
     getchar();           // consome o \n que sobra após scanf
 
-    Paciente *p = criar_paciente(nome, idade);
+    printf("  CPF   : ");
+    fflush(stdout);
+    fgets(cpf, sizeof(cpf), stdin);
+    cpf[strcspn(cpf, "\n")] = '\0'; // remove o \n do fgets
+
+    printf("  RG    : ");
+    fflush(stdout);
+    fgets(rg, sizeof(rg), stdin);
+    rg[strcspn(rg, "\n")] = '\0'; // remove o \n do fgets
+
+    printf("  Nascimento : ");
+    fflush(stdout);
+    fgets(data_nascimento, sizeof(data_nascimento), stdin);
+    data_nascimento[strcspn(data_nascimento, "\n")] = '\0'; // remove o \n do fgets
+
+    Paciente *p = criar_paciente(nome, idade, cpf, rg, data_nascimento); // cria paciente com os dados lidos
 
     linha('-', 50);
     printf("  TRIAGEM - responda s/n para cada pergunta\n");
@@ -87,7 +105,10 @@ void testar_triagem(Nodoarvore *raiz, Fila *fila)
         cor = "+++ VERDE    - LEVE     +++";
 
     printf("\n  %s\n", cor);
-    printf("\n  Paciente     : %s, %d anos\n", p->nome, p->idade);
+    printf("\n  Paciente     : %s, %d anos", p->nome, p->idade);
+    printf("  CPF          : %s\n", p->cpf);
+    printf("  RG           : %s\n", p->rg);
+    printf("  Nascimento   : %s\n", p->data_nascimento);
     printf("  Prioridade   : %s\n", prioridade_para_string(p->prioridade));
     printf("  Justificativa: %s\n\n", p->justificativa);
 
