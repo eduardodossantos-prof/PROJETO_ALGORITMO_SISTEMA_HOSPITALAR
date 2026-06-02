@@ -1,5 +1,19 @@
 #include <gtk/gtk.h>
 
+GtkWidget* criar_modulo_consulta(void);
+
+gboolean ao_clicar_no_quadrado(GtkWidget *widget, GdkEventButton *event, gpointer data){
+    GtkStack *stack = GTK_STACK(data);
+    gtk_stack_set_visible_child_name(stack, "tela_triagem");
+    g_print("Trocando para a tela de triagem... \n");
+    return TRUE;
+}
+gboolean ao_clicar_no_quadrado_2(GtkWidget *widget, GdkEventButton *event, gpointer data){
+    GtkStack *stack = GTK_STACK(data);
+    gtk_stack_set_visible_child_name(stack, "tela_consulta");
+    g_print("Trocando para a tela de triagem... \n");
+    return TRUE;
+}
 gboolean desenhar_quadrado(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
@@ -8,7 +22,6 @@ gboolean desenhar_quadrado(GtkWidget *widget, cairo_t *cr, gpointer data)
     cairo_fill(cr);
     return FALSE;
 }
-
 gboolean desenhar_quadrado_triagem(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
@@ -18,7 +31,7 @@ gboolean desenhar_quadrado_triagem(GtkWidget *widget, cairo_t *cr, gpointer data
     return FALSE;
 }
 
-GtkWidget* criar_modulo_triagem(){
+GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal){
     GtkWidget *fixed;
     GtkWidget *titulo_triagem;
     GtkWidget *label_nome, *entry_name;
@@ -27,9 +40,11 @@ GtkWidget* criar_modulo_triagem(){
     GtkWidget *label_data_de_nascimento, *entry_data_de_nascimento;
     GtkWidget *label_descricao, *entry_descricao;
     GtkWidget *label_classificao, *entry_classificacao;
+    GtkWidget *proximo_triagem, *name_triagem, *stack_1, *tela_consulta;
+    GtkWidget *event_box;
 
     fixed = gtk_fixed_new();
-    
+
     titulo_triagem = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(titulo_triagem),
     "<span face='Arial' size='30000' foreground='#000000' ><b>Serviço de Atendimento Hospitalar</b></span>");
@@ -68,15 +83,84 @@ GtkWidget* criar_modulo_triagem(){
     gtk_combo_box_set_active(GTK_COMBO_BOX(entry_classificacao), 0);
     gtk_fixed_put(GTK_FIXED(fixed), entry_classificacao, 200, 260);
 
+    proximo_triagem = gtk_drawing_area_new();
+    gtk_widget_set_size_request(proximo_triagem, 400, 200);
+    g_signal_connect(proximo_triagem, "draw", G_CALLBACK(desenhar_quadrado_triagem), NULL);
+    gtk_fixed_put(GTK_FIXED(fixed), proximo_triagem, 450, 520);
+    gtk_widget_add_events(proximo_triagem, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect(proximo_triagem, "button-press-event", G_CALLBACK(ao_clicar_no_quadrado_2), stack_principal);
+
+    titulo_triagem = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(titulo_triagem),
+    "<span face='Arial' size='20000' foreground='#000000' ><b>Próximo</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 650, 580);
+
     return fixed;
 }
 
-gboolean ao_clicar_no_quadrado(GtkWidget *widget, GdkEventButton *event, gpointer data){
-    GtkStack *stack = GTK_STACK(data);
-    gtk_stack_set_visible_child_name(stack, "tela_triagem");
-    g_print("Trocando para a tela de triagem... \n");
-    return TRUE;
+GtkWidget* criar_modulo_consulta(){
+   GtkWidget *fixed2;
+    GtkWidget *frame_titulo;
+    GtkWidget *label_titulo;
+
+    fixed2 = gtk_fixed_new();
+
+    // 1. BARRA DE TÍTULO ("Chamada")
+    frame_titulo = gtk_frame_new(NULL);
+    // Dimensões: Largura de 800px, Altura de 50px
+    gtk_widget_set_size_request(frame_titulo, 800, 50);
+    // Centralizando na janela de 1200px (x = 200)
+    gtk_fixed_put(GTK_FIXED(fixed2), frame_titulo, 200, 50);
+
+    label_titulo = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(label_titulo), 
+        "<span face='Arial' size='20000' foreground='#000000'><b>Tela de Chamada</b></span>");
+    gtk_container_add(GTK_CONTAINER(frame_titulo), label_titulo);
+
+    // 2. BLOCOS DE PACIENTES
+    // Utilizando um loop for para criar os 3 blocos idênticos e economizar código
+    for (int i = 0; i < 3; i++) {
+        // Calcula a posição vertical (Y) de cada bloco: 120, 260, 400
+        int y_offset = 120 + (i * 140); 
+
+        // Borda do bloco inteiro (Retângulo externo)
+        GtkWidget *frame_bloco = gtk_frame_new(NULL);
+        gtk_widget_set_size_request(frame_bloco, 800, 120);
+        gtk_fixed_put(GTK_FIXED(fixed2), frame_bloco, 200, y_offset);
+
+        // Container interno do bloco (para usarmos coordenadas X e Y relativas ao bloco)
+        GtkWidget *fixed_interno = gtk_fixed_new();
+        gtk_container_add(GTK_CONTAINER(frame_bloco), fixed_interno);
+
+        // Linha divisória vertical (Separando a coluna "Paciente" da coluna "Senha")
+        GtkWidget *separador = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+        gtk_widget_set_size_request(separador, 2, 120);
+        // Posicionada no X = 550 (Deixa mais espaço para o nome do paciente)
+        gtk_fixed_put(GTK_FIXED(fixed_interno), separador, 550, 0); 
+
+        // Textos do lado esquerdo (Paciente e Classificação)
+        GtkWidget *label_paciente = gtk_label_new(NULL);
+        gtk_label_set_markup(GTK_LABEL(label_paciente), 
+            "<span face='Arial' size='12000' foreground='#000000'>Paciente:</span>");
+        gtk_fixed_put(GTK_FIXED(fixed_interno), label_paciente, 10, 10);
+
+        GtkWidget *label_classificacao = gtk_label_new(NULL);
+        gtk_label_set_markup(GTK_LABEL(label_classificacao), 
+            "<span face='Arial' size='12000' foreground='#000000'>Classificação: Verde/Amarelo/Vermelho</span>");
+        // Posicionado na parte inferior do bloco
+        gtk_fixed_put(GTK_FIXED(fixed_interno), label_classificacao, 10, 90);
+
+        // Texto do lado direito (Senha)
+        GtkWidget *label_senha = gtk_label_new(NULL);
+        gtk_label_set_markup(GTK_LABEL(label_senha), 
+            "<span face='Arial' size='12000' foreground='#000000'>Senha:</span>");
+        // Posicionado do lado direito da linha divisória
+        gtk_fixed_put(GTK_FIXED(fixed_interno), label_senha, 560, 10);
+    }
+
+    return fixed2;
 }
+
 
 int main(int argc, char *argv[]) {
   
@@ -91,6 +175,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *stack;
     GdkPixbuf *imagem_original;
     GdkPixbuf *imagem_redimensionada;
+    GtkWidget *tela_consulta;
     GError *erro = NULL;
 
     gtk_init(&argc, &argv);
@@ -99,7 +184,6 @@ int main(int argc, char *argv[]) {
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Sistema Hospitalar - Triagem");
     
-    // AJUSTE: Janela um pouco maior para acomodar os 3 blocos lado a lado com folga
     gtk_window_set_default_size(GTK_WINDOW(window), 1200, 700);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
@@ -111,7 +195,7 @@ int main(int argc, char *argv[]) {
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), 
         "<span face='Arial' size='30000' foreground='#000000'><b>SERVIÇO DE ATENDIMENTO HOSPITALAR</b></span>");
-    gtk_fixed_put(GTK_FIXED(fixed), label, 300, 80); // Subi um pouco o título (y=50)
+    gtk_fixed_put(GTK_FIXED(fixed), label, 300, 80); 
 
     imagem_original = gdk_pixbuf_new_from_file("univasf_logo.png", &erro);
 
@@ -125,7 +209,6 @@ int main(int argc, char *argv[]) {
         g_object_unref(imagem_original);
         g_object_unref(imagem_redimensionada);
 
-        // AJUSTE: Subi a logo para y=600 para garantir que fique visível na tela
         gtk_fixed_put(GTK_FIXED(fixed), janela_logo, 20, 660);
     }
   
@@ -133,7 +216,6 @@ int main(int argc, char *argv[]) {
     area_desenho_2 = gtk_drawing_area_new();
     area_desenho_3 = gtk_drawing_area_new();
 
-    // CORREÇÃO CRUCIAL: Tamanho exato de cada área para evitar que se sobreponham
     gtk_widget_set_size_request(area_desenho, 400, 300);
     gtk_widget_set_size_request(area_desenho_2, 400, 300);
     gtk_widget_set_size_request(area_desenho_3, 400, 300);
@@ -146,7 +228,6 @@ int main(int argc, char *argv[]) {
     g_signal_connect(area_desenho_2, "draw", G_CALLBACK(desenhar_quadrado), NULL);
     g_signal_connect(area_desenho_3, "draw", G_CALLBACK(desenhar_quadrado), NULL);
 
-    // Posicionando sem colisão (x=0, x=400, x=800)
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho, 90, 180);
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho_2, 440, 180);
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho_3, 790, 180);
@@ -155,9 +236,12 @@ int main(int argc, char *argv[]) {
 
     gtk_stack_add_named(GTK_STACK(stack), fixed, "tela_inicial");
 
-    // Tela de triagem
-    tela_triagem = criar_modulo_triagem();
+    //Tela de Triagem
+    tela_triagem = criar_modulo_triagem(stack);
     gtk_stack_add_named(GTK_STACK(stack), tela_triagem, "tela_triagem");
+
+    tela_consulta = criar_modulo_consulta();
+    gtk_stack_add_named(GTK_STACK(stack), tela_consulta, "tela_consulta");
 
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "tela_inicial");
 
