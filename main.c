@@ -14,6 +14,7 @@ gboolean ao_clicar_no_quadrado_2(GtkWidget *widget, GdkEventButton *event, gpoin
     g_print("Trocando para a tela de triagem... \n");
     return TRUE;
 }
+
 gboolean desenhar_quadrado(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
@@ -46,8 +47,8 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal){
 
     titulo_triagem = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(titulo_triagem),
-    "<span face='Arial' size='30000' foreground='#000000' ><b>Serviço de Atendimento Hospitalar</b></span>");
-    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 380, 60);
+    "<span face='Arial' size='30000' foreground='#000000' ><b>Tela de Triagem</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 560, 60);
 
     entry_name = gtk_entry_new();
     gtk_widget_set_size_request(entry_name, 1000, -1);   
@@ -168,6 +169,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *fixed; 
     GtkWidget *tela_triagem;
     GtkWidget *area_desenho;
+    GtkWidget *name_label_triagem, *name_label_historico, *name_label_configuracoes;
     GtkWidget *area_desenho_2;
     GtkWidget *area_desenho_3;
     GtkWidget *label;
@@ -186,14 +188,16 @@ int main(int argc, char *argv[]) {
     gtk_window_set_default_size(GTK_WINDOW(window), 1200, 700);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
+    //Criação do stack para organizar os eventos de troca de telas
     stack = gtk_stack_new();
     gtk_container_add(GTK_CONTAINER(window), stack);
 
     fixed = gtk_fixed_new();
 
+    //Titulo do sistema de saúde hospitalar.
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), 
-        "<span face='Arial' size='30000' foreground='#000000'><b>SERVIÇO DE ATENDIMENTO HOSPITALAR</b></span>");
+        "<span face='Arial' size='30000' weight='bold' foreground='#000000'><b>SERVIÇO DE ATENDIMENTO HOSPITALAR</b></span>");
     gtk_fixed_put(GTK_FIXED(fixed), label, 300, 80); 
 
     imagem_original = gdk_pixbuf_new_from_file("univasf_logo.png", &erro);
@@ -227,12 +231,31 @@ int main(int argc, char *argv[]) {
     g_signal_connect(area_desenho_2, "draw", G_CALLBACK(desenhar_quadrado), NULL);
     g_signal_connect(area_desenho_3, "draw", G_CALLBACK(desenhar_quadrado), NULL);
 
+    //Desenhando os quadrados na tela
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho, 90, 180);
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho_2, 440, 180);
     gtk_fixed_put(GTK_FIXED(fixed), area_desenho_3, 790, 180);
 
-    g_signal_connect(area_desenho, "button-press-event", G_CALLBACK(ao_clicar_no_quadrado), stack);
+    //Nome da tela de Triagem para colocar no quadrado;
+    name_label_triagem = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(name_label_triagem), 
+	    "<span face='Arial' size='20500' foreground='#000000'><b>Tela de Triagem</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), name_label_triagem, 240, 320);
 
+    //Nome da tela de Histórico para colocar no quadrado;
+    name_label_historico = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(name_label_historico), 
+	    "<span face='Arial' size='20500' foreground='#000000'><b>Tela de histórico</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), name_label_historico, 585, 320);
+
+    //Nome da tela de Configurações para colocar no quadrado;
+    name_label_configuracoes = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(name_label_configuracoes), 
+	    "<span face='Arial' size='20000' foreground='#000000'><b>Tela de Configurações</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), name_label_configuracoes, 905, 320);
+
+
+    g_signal_connect(area_desenho, "button-press-event", G_CALLBACK(ao_clicar_no_quadrado), stack);
     gtk_stack_add_named(GTK_STACK(stack), fixed, "tela_inicial");
 
     //Tela de Triagem
