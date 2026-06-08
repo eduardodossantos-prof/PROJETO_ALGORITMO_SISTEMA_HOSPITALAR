@@ -17,7 +17,6 @@ gboolean ao_clicar_no_quadrado_2(GtkWidget *widget, GdkEventButton *event, gpoin
 gboolean desenhar_quadrado(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
-    // Retângulo vai do x=100 até 400, e do y=50 até 270
     cairo_rectangle(cr, 100, 50, 300, 220);
     cairo_fill(cr);
     return FALSE;
