@@ -36,6 +36,7 @@ void gui_iniciar(AppState *state, int argc, char *argv[]);
 GtkWidget *criar_tela_inicial(AppState *state);
 GtkWidget *criar_tela_historico(AppState *state);
 GtkWidget *criar_tela_chamada(AppState *state);
+GtkWidget *criar_tela_triagem(AppState *state);
 
 // Atualiza as telas após mudanças nas estruturas
 void atualizar_grid_historico(AppState *state);

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     state.historico = criar_pilha();
     // teste
     //  ── Pacientes fictícios para teste ───────────────────────────
-
+    /*
     // Paciente 1 — vermelho
     Paciente *p1 = criar_paciente("João Silva", 45, "12312", "12312", "10/05/1979");
     p1->prioridade = PRIORIDADE_VERMELHA;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     strcpy(p4->data_nascimento, "08/11/1969");
     strcpy(p4->justificativa, "Dor intensa sem outros sintomas graves");
     empilhar(state.historico, p4);
-
+    */
     // Inicia a interface gráfica — só retorna quando o usuário fechar a janela
     gui_iniciar(&state, argc, argv);
 
