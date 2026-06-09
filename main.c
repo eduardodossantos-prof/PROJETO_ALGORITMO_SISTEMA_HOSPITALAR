@@ -237,8 +237,7 @@ gboolean ao_clicar_no_quadrado_2(GtkWidget *widget, GdkEventButton *event, gpoin
     }
 
     Paciente *novo_paciente = g_new0(Paciente, 1);
-
-    novo_paciente->next = NULL;
+    
 
     strncpy(
         novo_paciente->nome,
