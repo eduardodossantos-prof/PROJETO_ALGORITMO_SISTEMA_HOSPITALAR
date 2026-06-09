@@ -1,26 +1,28 @@
 #ifndef PILHA_H // evitar múltiplas inclusões
 #define PILHA_H // pilha.h: definição da estrutura Pilha e funções para manipulação da pilha de pacientes
-//A pilha vai ser usada pra fazer o histórico de pacientes que foi atendido apos passar pela fila de prioridade
+// A pilha vai ser usada pra fazer o histórico de pacientes que foi atendido apos passar pela fila de prioridade
 #include "paciente.h" // incluir a definição da struct Paciente
-typedef struct NoPilha{
-    Paciente  *paciente;
-    struct NoPilha *prox;
+typedef struct NoPilha
+{
+    Paciente *paciente;
+    struct NoPilha *abaixo; // aponta para o próximo nó da pilha, ou seja, o paciente atendido antes do atual
 } NoPilha;
-typedef struct Pilha{
+typedef struct Pilha
+{
     NoPilha *topo;
     int tam;
 } Pilha;
 // Operações de criação e destruição
-Pilha   *criar_pilha(void);
-void     destruir_pilha(Pilha *pilha);
- 
+Pilha *criar_pilha(void);
+void destruir_pilha(Pilha *pilha);
+
 // Operações
-void     empilhar(Pilha *pilha, Paciente *paciente);
+void empilhar(Pilha *pilha, Paciente *paciente);
 Paciente *desempilhar(Pilha *pilha);
 Paciente *topo_pilha(const Pilha *pilha);
-int      pilha_vazia(const Pilha *pilha);
- 
+int pilha_vazia(const Pilha *pilha);
+
 // Debug
-void     imprimir_pilha(const Pilha *pilha);
- 
+void imprimir_pilha(const Pilha *pilha);
+
 #endif

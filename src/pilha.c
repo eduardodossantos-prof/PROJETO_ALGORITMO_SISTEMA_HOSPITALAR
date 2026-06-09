@@ -28,7 +28,7 @@ void destruir_pilha(Pilha *pilha)
     NoPilha *atual = pilha->topo;
     while (atual)
     {
-        NoPilha *prox = atual->prox;
+        NoPilha *prox = atual->abaixo;
         destruir_paciente(atual->paciente);
         free(atual);
         atual = prox;
@@ -57,7 +57,7 @@ void empilhar(Pilha *pilha, Paciente *paciente)
     // O novo nó aponta para o topo atual
     // depois vira o novo topo
     no->paciente = paciente;
-    no->prox = pilha->topo;
+    no->abaixo = pilha->topo;
     pilha->topo = no;
     pilha->tam++;
 }
@@ -76,7 +76,7 @@ Paciente *desempilhar(Pilha *pilha)
     NoPilha *no = pilha->topo;
     Paciente *paciente = no->paciente;
 
-    pilha->topo = no->prox;
+    pilha->topo = no->abaixo;
     pilha->tam--;
     free(no);
 
@@ -138,7 +138,7 @@ void imprimir_pilha(const Pilha *pilha)
                atual->paciente->idade);
         printf("     %s\n", atual->paciente->justificativa);
 
-        atual = atual->prox;
+        atual = atual->abaixo;
     }
 
     printf("======================================\n");
