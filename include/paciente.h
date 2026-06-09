@@ -15,7 +15,6 @@ typedef struct Paciente
     char data_nascimento[11]; // Ex: 31/12/1999 (10 chars + 1)
     int prioridade;           // usa as constantes acima
     char justificativa[300];  // explicação do motivo da prioridade, preenchida após a triagem
-    struct Paciente *next;    // encadeamento da fila
 } Paciente;
 
 // isso aq vai ser exclusivamente pra debugar o codigo, não é necessário para a implementação da fila de pacientes mas é útil para verificar se os dados estão sendo armazenados corretamente

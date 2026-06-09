@@ -177,7 +177,7 @@ void atualizar_grid_historico(AppState *state)
         int linha = indice / 2;
         gtk_grid_attach(GTK_GRID(state->grid_historico), card, coluna, linha, 1, 1);
 
-        no = no->prox;
+        no = no->abaixo;
         indice++;
     }
 
@@ -215,8 +215,8 @@ void atualizar_tela_chamada(AppState *state)
         return;
     }
 
-    // Percorre a fila e cria uma linha por paciente
-    Paciente *atual = state->fila->head;
+    // Percorre a fila pelos NoFila e cria uma linha por paciente
+    NoFila *atual = state->fila->head;
     int indice = 0;
 
     while (atual)
@@ -225,10 +225,10 @@ void atualizar_tela_chamada(AppState *state)
         GtkWidget *linha_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
         gtk_widget_set_margin_bottom(linha_box, 8);
 
-        // Card do paciente
+        // Card do paciente — passa atual->paciente para o callback de desenho
         GtkWidget *card = gtk_drawing_area_new();
         gtk_widget_set_size_request(card, 480, 145);
-        g_signal_connect(card, "draw", G_CALLBACK(desenhar_card), atual);
+        g_signal_connect(card, "draw", G_CALLBACK(desenhar_card), atual->paciente);
         gtk_box_pack_start(GTK_BOX(linha_box), card, FALSE, FALSE, 0);
 
         // Botão — só no primeiro da fila
@@ -260,7 +260,7 @@ void atualizar_tela_chamada(AppState *state)
 
         gtk_box_pack_start(GTK_BOX(state->box_chamada), linha_box, FALSE, FALSE, 0);
 
-        atual = atual->next;
+        atual = atual->prox;
         indice++;
     }
 

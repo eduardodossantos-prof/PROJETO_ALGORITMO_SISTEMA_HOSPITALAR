@@ -26,8 +26,6 @@ Paciente *criar_paciente(const char *nome, int idade, const char *cpf, const cha
     p->prioridade = 0;          // ainda não triado
     p->justificativa[0] = '\0'; // vazio até a triagem
 
-    p->next = NULL;
-
     return p;
 }
 
@@ -51,24 +49,4 @@ const char *prioridade_para_string(int prioridade)
     default:
         return "Nao TRIADO";
     }
-}
-// Debug
-void imprimir_paciente(const Paciente *p)
-{
-    if (!p)
-    {
-        printf("[DEBUG] Paciente NULL\n");
-        return;
-    }
-
-    printf("-----------------------------\n");
-    printf("[DEBUG] Nome       : %s\n", p->nome);
-    printf("[DEBUG] Idade      : %d\n", p->idade);
-    printf("[DEBUG] CPF        : %s\n", p->cpf);
-    printf("[DEBUG] RG         : %s\n", p->rg);
-    printf("[DEBUG] Nascimento : %s\n", p->data_nascimento);
-    printf("[DEBUG] Prioridade : %s\n", prioridade_para_string(p->prioridade));
-    printf("[DEBUG] Justif.    : %s\n", p->justificativa);
-    printf("[DEBUG] Next       : %p\n", (void *)p->next);
-    printf("-----------------------------\n");
 }
