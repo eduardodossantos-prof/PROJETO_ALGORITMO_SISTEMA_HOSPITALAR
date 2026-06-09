@@ -26,6 +26,20 @@ GtkWidget* criar_modulo_consulta(void);
 GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal);
 
 /* ============================================================
+   VARIÁVEIS GLOBAIS DA TELA DE CONSULTA
+   ============================================================ */
+
+static GtkWidget *consulta_label_nome = NULL;
+static GtkWidget *consulta_label_cpf = NULL;
+static GtkWidget *consulta_label_rg = NULL;
+static GtkWidget *consulta_label_data_nascimento = NULL;
+static GtkWidget *consulta_label_classificacao = NULL;
+static GtkWidget *consulta_label_justificativa = NULL;
+static GtkWidget *consulta_label_senha = NULL;
+
+static int contador_senha = 1;
+
+/* ============================================================
    FUNÇÕES AUXILIARES DA TRIAGEM
    ============================================================ */
 
@@ -45,6 +59,71 @@ const char *nome_prioridade(int prioridade)
         default:
             return "DESCONHECIDA";
     }
+}
+
+void atualizar_tela_consulta(ContextoTriagem *ctx)
+{
+    if (!ctx || !ctx->paciente_atual)
+        return;
+
+    Paciente *p = ctx->paciente_atual;
+
+    char texto_nome[200];
+    char texto_cpf[100];
+    char texto_rg[100];
+    char texto_data[150];
+    char texto_classificacao[150];
+    char texto_justificativa[600];
+    char texto_senha[100];
+
+    snprintf(texto_nome, sizeof(texto_nome), "Paciente: %s", p->nome);
+    snprintf(texto_cpf, sizeof(texto_cpf), "CPF: %s", p->cpf);
+    snprintf(texto_rg, sizeof(texto_rg), "RG: %s", p->rg);
+    snprintf(texto_data, sizeof(texto_data), "Data de nascimento: %s", p->data_nascimento);
+
+    snprintf(
+        texto_classificacao,
+        sizeof(texto_classificacao),
+        "Classificação: %s",
+        nome_prioridade(p->prioridade)
+    );
+
+    snprintf(
+        texto_justificativa,
+        sizeof(texto_justificativa),
+        "Justificativa: %s",
+        p->justificativa
+    );
+
+    snprintf(
+        texto_senha,
+        sizeof(texto_senha),
+        "Senha: %03d",
+        contador_senha
+    );
+
+    contador_senha++;
+
+    if (consulta_label_nome)
+        gtk_label_set_text(GTK_LABEL(consulta_label_nome), texto_nome);
+
+    if (consulta_label_cpf)
+        gtk_label_set_text(GTK_LABEL(consulta_label_cpf), texto_cpf);
+
+    if (consulta_label_rg)
+        gtk_label_set_text(GTK_LABEL(consulta_label_rg), texto_rg);
+
+    if (consulta_label_data_nascimento)
+        gtk_label_set_text(GTK_LABEL(consulta_label_data_nascimento), texto_data);
+
+    if (consulta_label_classificacao)
+        gtk_label_set_text(GTK_LABEL(consulta_label_classificacao), texto_classificacao);
+
+    if (consulta_label_justificativa)
+        gtk_label_set_text(GTK_LABEL(consulta_label_justificativa), texto_justificativa);
+
+    if (consulta_label_senha)
+        gtk_label_set_text(GTK_LABEL(consulta_label_senha), texto_senha);
 }
 
 void atualizar_pergunta_triagem(ContextoTriagem *ctx)
@@ -73,20 +152,24 @@ void atualizar_pergunta_triagem(ContextoTriagem *ctx)
 
         g_print("\n--- TRIAGEM FINALIZADA ---\n");
         g_print("Paciente: %s\n", ctx->paciente_atual->nome);
+        g_print("CPF: %s\n", ctx->paciente_atual->cpf);
+        g_print("RG: %s\n", ctx->paciente_atual->rg);
+        g_print("Data de nascimento: %s\n", ctx->paciente_atual->data_nascimento);
         g_print("Prioridade: %s\n", nome_prioridade(ctx->paciente_atual->prioridade));
         g_print("Justificativa: %s\n", ctx->paciente_atual->justificativa);
 
         /*
-           Se quiser ir automaticamente para a tela de consulta
-           depois da classificação, descomente a linha abaixo:
+           Envia os dados coletados para a tela de consulta.
         */
+        atualizar_tela_consulta(ctx);
 
         /*
+           Vai automaticamente para a tela de consulta.
+        */
         gtk_stack_set_visible_child_name(
             GTK_STACK(ctx->stack),
             "tela_consulta"
         );
-        */
 
         return;
     }
@@ -283,7 +366,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     gtk_fixed_put(GTK_FIXED(fixed), entry_data_de_nascimento, 850, 200);
 
     /*
-       Quadrado do botão Confirmar
+       Quadrado do botão Confirmar.
     */
     proximo_triagem = gtk_drawing_area_new();
     gtk_widget_set_size_request(proximo_triagem, 400, 200);
@@ -304,7 +387,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     gtk_fixed_put(GTK_FIXED(fixed), label_confirmar, 640, 280);
 
     /*
-       Quadrado onde aparece a pergunta
+       Quadrado onde aparece a pergunta.
     */
     quadrado_perguntas = gtk_drawing_area_new();
     gtk_widget_set_size_request(quadrado_perguntas, 1000, 200);
@@ -317,7 +400,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     gtk_fixed_put(GTK_FIXED(fixed), quadrado_perguntas, 200, 350);
 
     /*
-       Texto da pergunta dentro do quadrado
+       Texto da pergunta dentro do quadrado.
     */
     label_pergunta = gtk_label_new(
         "Preencha os dados do paciente e clique em Confirmar."
@@ -330,14 +413,14 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     gtk_fixed_put(GTK_FIXED(fixed), label_pergunta, 250, 380);
 
     /*
-       Botão SIM
+       Botão SIM.
     */
     botao_sim = gtk_button_new_with_label("SIM");
     gtk_widget_set_size_request(botao_sim, 300, 50);
     gtk_fixed_put(GTK_FIXED(fixed), botao_sim, 300, 600);
 
     /*
-       Botão NÃO
+       Botão NÃO.
     */
     botao_nao = gtk_button_new_with_label("NÃO");
     gtk_widget_set_size_request(botao_nao, 300, 50);
@@ -347,7 +430,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     gtk_widget_set_sensitive(botao_nao, FALSE);
 
     /*
-       Contexto da triagem
+       Contexto da triagem.
     */
     ContextoTriagem *contexto_triagem = g_new0(ContextoTriagem, 1);
 
@@ -366,7 +449,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     contexto_triagem->paciente_atual = NULL;
 
     /*
-       Clique no Confirmar
+       Clique no Confirmar.
     */
     g_signal_connect(
         proximo_triagem,
@@ -376,7 +459,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     );
 
     /*
-       Clique no SIM
+       Clique no SIM.
     */
     g_object_set_data(
         G_OBJECT(botao_sim),
@@ -392,7 +475,7 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal)
     );
 
     /*
-       Clique no NÃO
+       Clique no NÃO.
     */
     g_object_set_data(
         G_OBJECT(botao_nao),
@@ -422,53 +505,73 @@ GtkWidget* criar_modulo_consulta()
 
     fixed2 = gtk_fixed_new();
 
+    /*
+       Título da tela de consulta.
+    */
     frame_titulo = gtk_frame_new(NULL);
-    gtk_widget_set_size_request(frame_titulo, 800, 50);
-    gtk_fixed_put(GTK_FIXED(fixed2), frame_titulo, 200, 50);
+    gtk_widget_set_size_request(frame_titulo, 900, 60);
+    gtk_fixed_put(GTK_FIXED(fixed2), frame_titulo, 150, 40);
 
     label_titulo = gtk_label_new(NULL);
     gtk_label_set_markup(
         GTK_LABEL(label_titulo),
-        "<span face='Arial' size='20000' foreground='#000000'><b>Tela de Chamada</b></span>"
+        "<span face='Arial' size='22000' foreground='#000000'><b>Tela de Consulta</b></span>"
     );
     gtk_container_add(GTK_CONTAINER(frame_titulo), label_titulo);
 
-    for (int i = 0; i < 3; i++)
-    {
-        int y_offset = 120 + (i * 140);
+    /*
+       Bloco principal com os dados do paciente.
+    */
+    GtkWidget *frame_bloco = gtk_frame_new(NULL);
+    gtk_widget_set_size_request(frame_bloco, 900, 430);
+    gtk_fixed_put(GTK_FIXED(fixed2), frame_bloco, 150, 130);
 
-        GtkWidget *frame_bloco = gtk_frame_new(NULL);
-        gtk_widget_set_size_request(frame_bloco, 800, 120);
-        gtk_fixed_put(GTK_FIXED(fixed2), frame_bloco, 200, y_offset);
+    GtkWidget *fixed_interno = gtk_fixed_new();
+    gtk_container_add(GTK_CONTAINER(frame_bloco), fixed_interno);
 
-        GtkWidget *fixed_interno = gtk_fixed_new();
-        gtk_container_add(GTK_CONTAINER(frame_bloco), fixed_interno);
+    consulta_label_nome = gtk_label_new("Paciente:");
+    gtk_widget_set_size_request(consulta_label_nome, 820, 30);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_nome), 0.0);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_nome, 30, 30);
 
-        GtkWidget *separador = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-        gtk_widget_set_size_request(separador, 2, 120);
-        gtk_fixed_put(GTK_FIXED(fixed_interno), separador, 550, 0);
+    consulta_label_cpf = gtk_label_new("CPF:");
+    gtk_widget_set_size_request(consulta_label_cpf, 350, 30);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_cpf), 0.0);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_cpf, 30, 80);
 
-        GtkWidget *label_paciente = gtk_label_new(NULL);
-        gtk_label_set_markup(
-            GTK_LABEL(label_paciente),
-            "<span face='Arial' size='12000' foreground='#000000'>Paciente:</span>"
-        );
-        gtk_fixed_put(GTK_FIXED(fixed_interno), label_paciente, 10, 10);
+    consulta_label_rg = gtk_label_new("RG:");
+    gtk_widget_set_size_request(consulta_label_rg, 350, 30);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_rg), 0.0);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_rg, 450, 80);
 
-        GtkWidget *label_classificacao = gtk_label_new(NULL);
-        gtk_label_set_markup(
-            GTK_LABEL(label_classificacao),
-            "<span face='Arial' size='12000' foreground='#000000'>Classificação: Verde/Amarelo/Vermelho</span>"
-        );
-        gtk_fixed_put(GTK_FIXED(fixed_interno), label_classificacao, 10, 90);
+    consulta_label_data_nascimento = gtk_label_new("Data de nascimento:");
+    gtk_widget_set_size_request(consulta_label_data_nascimento, 500, 30);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_data_nascimento), 0.0);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_data_nascimento, 30, 130);
 
-        GtkWidget *label_senha = gtk_label_new(NULL);
-        gtk_label_set_markup(
-            GTK_LABEL(label_senha),
-            "<span face='Arial' size='12000' foreground='#000000'>Senha:</span>"
-        );
-        gtk_fixed_put(GTK_FIXED(fixed_interno), label_senha, 560, 10);
-    }
+    consulta_label_classificacao = gtk_label_new("Classificação:");
+    gtk_widget_set_size_request(consulta_label_classificacao, 500, 30);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_classificacao), 0.0);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_classificacao, 30, 190);
+
+    consulta_label_senha = gtk_label_new("Senha:");
+    gtk_widget_set_size_request(consulta_label_senha, 300, 30);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_senha), 0.0);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_senha, 600, 190);
+
+    consulta_label_justificativa = gtk_label_new("Justificativa:");
+    gtk_widget_set_size_request(consulta_label_justificativa, 820, 120);
+    gtk_label_set_xalign(GTK_LABEL(consulta_label_justificativa), 0.0);
+    gtk_label_set_yalign(GTK_LABEL(consulta_label_justificativa), 0.0);
+    gtk_label_set_line_wrap(GTK_LABEL(consulta_label_justificativa), TRUE);
+    gtk_fixed_put(GTK_FIXED(fixed_interno), consulta_label_justificativa, 30, 250);
+
+    GtkWidget *label_aviso = gtk_label_new(NULL);
+    gtk_label_set_markup(
+        GTK_LABEL(label_aviso),
+        "<span face='Arial' size='11000' foreground='#555555'>Os dados aparecerão aqui após finalizar a triagem.</span>"
+    );
+    gtk_fixed_put(GTK_FIXED(fixed2), label_aviso, 150, 590);
 
     return fixed2;
 }
