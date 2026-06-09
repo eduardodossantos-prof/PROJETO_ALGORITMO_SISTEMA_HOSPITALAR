@@ -1,4 +1,14 @@
 #include <gtk/gtk.h>
+#include "include\paciente.h"
+#include "include\arvore.h"
+
+typedef struct {
+    GtkWidget *entry_nome;
+    GtkWidget *entry_rg;
+    GtkWidget *entry_cpf;
+    GtkWidget *entry_data_nascimento;
+    GtkWidget *stack;
+}ContextoTriagem;
 
 GtkWidget* criar_modulo_consulta(void);
 
@@ -6,19 +16,45 @@ gboolean ao_clicar_no_quadrado(GtkWidget *widget, GdkEventButton *event, gpointe
     GtkStack *stack = GTK_STACK(data);
     gtk_stack_set_visible_child_name(stack, "tela_triagem");
     g_print("Trocando para a tela de triagem... \n");
-    return TRUE;
+    return TRUE;    
 }
 gboolean ao_clicar_no_quadrado_2(GtkWidget *widget, GdkEventButton *event, gpointer data){
-    GtkStack *stack = GTK_STACK(data);
-    gtk_stack_set_visible_child_name(stack, "tela_consulta");
-    g_print("Trocando para a tela de triagem... \n");
+    ContextoTriagem *ctx = (ContextoTriagem *)data;
+    Paciente *novo_paciente = g_new(Paciente, 1);
+    novo_paciente->next = NULL;
+
+    strncpy(novo_paciente->nome, gtk_entry_get_text(GTK_ENTRY(ctx->entry_nome)), 99);
+    novo_paciente->nome[99] = '\0'; // CORRIGIDO: Aspas simples
+
+    strncpy(novo_paciente->cpf, gtk_entry_get_text(GTK_ENTRY(ctx->entry_cpf)), 14);
+    novo_paciente->cpf[14] = '\0'; // CORRIGIDO: Aspas simples
+
+    strncpy(novo_paciente->rg, gtk_entry_get_text(GTK_ENTRY(ctx->entry_rg)), 14);
+    novo_paciente->rg[14] = '\0'; // CORRIGIDO: Era 'nome', agora é 'rg'
+
+    strncpy(novo_paciente->data_nascimento, gtk_entry_get_text(GTK_ENTRY(ctx->entry_data_nascimento)), 10);
+    novo_paciente->data_nascimento[10] = '\0'; // CORRIGIDO: Era 'nome', agora é 'data_nascimento'
+
+    g_print("\n--- NOVO PACIENTE CADASTRADO ---\n");
+    g_print("Nome: %s\n", novo_paciente->nome);
+    g_print("CPF: %s\n", novo_paciente->cpf);
+
+    // 1. Muda de tela ANTES de liberar o contexto
+    gtk_stack_set_visible_child_name(GTK_STACK(ctx->stack), "tela_consulta");
+    g_print("Trocando para a tela de consulta... \n");
+
+    // 2. Libera a struct temporária
+    g_free(ctx);
+
+    // Retirado o código duplicado que causaria segmentation fault aqui
+
     return TRUE;
 }
 
 gboolean desenhar_quadrado(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
-    cairo_rectangle(cr, 100, 50, 300, 220);
+    cairo_rectangle(cr, 100, 50, 1000, 1000);
     cairo_fill(cr);
     return FALSE;
 }
@@ -31,6 +67,33 @@ gboolean desenhar_quadrado_triagem(GtkWidget *widget, cairo_t *cr, gpointer data
     return FALSE;
 }
 
+gboolean desenhar_quadrado_perguntas(GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+    cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
+    // O widget tem 1000x200. Começamos do 0,0 para preencher.
+    cairo_rectangle(cr, 0, 0, 1000, 200);
+    cairo_fill(cr);
+    return FALSE;
+}
+
+gboolean desenhar_quadrado_sim(GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+    cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
+    // O widget tem 100x500.
+    cairo_rectangle(cr, 0, 0, 10000, 50000);
+    cairo_fill(cr);
+    return FALSE;
+}
+
+gboolean desenhar_quadrado_nao(GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+    cairo_set_source_rgb(cr, 0.85, 0.85, 0.85);
+    // O widget tem 100x200.
+    cairo_rectangle(cr, 0, 0, 10000, 50000);
+    cairo_fill(cr);
+    return FALSE;
+}
+
 GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal){
     GtkWidget *fixed;
     GtkWidget *titulo_triagem;
@@ -38,9 +101,8 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal){
     GtkWidget *label_rg, *entry_rg;
     GtkWidget *label_cpf, *entry_cpf;
     GtkWidget *label_data_de_nascimento, *entry_data_de_nascimento;
-    GtkWidget *label_descricao, *entry_descricao;
-    GtkWidget *label_classificao, *entry_classificacao;
     GtkWidget *proximo_triagem, *name_triagem, *stack_1, *tela_consulta;
+    GtkWidget *perguntas, *quadrado_perguntas, *quadrado_sim, *quadrado_nao;
     GtkWidget *event_box;
 
     fixed = gtk_fixed_new();
@@ -70,31 +132,42 @@ GtkWidget* criar_modulo_triagem(GtkWidget *stack_principal){
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_data_de_nascimento), "DATA DE NASCIMENTO:");
     gtk_fixed_put(GTK_FIXED(fixed), entry_data_de_nascimento, 850, 200);
 
-    entry_descricao = gtk_entry_new();
-    gtk_widget_set_size_request(entry_descricao, 1000, 200);  
-    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_descricao), "DESCRICAO:");
-    gtk_fixed_put(GTK_FIXED(fixed), entry_descricao, 200, 320);
-
-    entry_classificacao = gtk_combo_box_text_new();
-    gtk_widget_set_size_request(entry_classificacao, 1000, -1);
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry_classificacao), "Verde");
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry_classificacao), "Amarelo");
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry_classificacao), "Vermelho");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(entry_classificacao), 0);
-    gtk_fixed_put(GTK_FIXED(fixed), entry_classificacao, 200, 260);
-
     proximo_triagem = gtk_drawing_area_new();
     gtk_widget_set_size_request(proximo_triagem, 400, 200);
     g_signal_connect(proximo_triagem, "draw", G_CALLBACK(desenhar_quadrado_triagem), NULL);
-    gtk_fixed_put(GTK_FIXED(fixed), proximo_triagem, 450, 520);
+    gtk_fixed_put(GTK_FIXED(fixed), proximo_triagem, 450, 220);
     gtk_widget_add_events(proximo_triagem, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect(proximo_triagem, "button-press-event", G_CALLBACK(ao_clicar_no_quadrado_2), stack_principal);
 
     titulo_triagem = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(titulo_triagem),
-    "<span face='Arial' size='20000' foreground='#000000' ><b>Próximo</b></span>");
-    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 650, 580);
+    "<span face='Arial' size='20000' foreground='#000000' ><b>Confirmar</b></span>");
+    gtk_fixed_put(GTK_FIXED(fixed), titulo_triagem, 640, 280);
 
+    //Retirar as informações dos placeholders
+    ContextoTriagem *contexto_triagem = g_new(ContextoTriagem, 1);
+    contexto_triagem->entry_nome = entry_name;
+    contexto_triagem->entry_cpf = entry_cpf;
+    contexto_triagem->entry_data_nascimento = entry_data_de_nascimento;
+    contexto_triagem->entry_rg = entry_rg;
+    contexto_triagem->stack = stack_principal;
+
+    quadrado_perguntas = gtk_drawing_area_new( );
+    gtk_widget_set_size_request(quadrado_perguntas, 1000, 200);
+    g_signal_connect(quadrado_perguntas, "draw", G_CALLBACK(desenhar_quadrado_perguntas), NULL);
+    gtk_fixed_put(GTK_FIXED(fixed), quadrado_perguntas, 200, 350);
+    
+    quadrado_sim = gtk_drawing_area_new( );
+    gtk_widget_set_size_request(quadrado_sim, 300, 50);
+    g_signal_connect(quadrado_sim, "draw", G_CALLBACK(desenhar_quadrado_sim), NULL);
+    gtk_fixed_put(GTK_FIXED(fixed), quadrado_sim, 300, 600);
+
+    quadrado_nao = gtk_drawing_area_new( );
+    gtk_widget_set_size_request(quadrado_nao, 300, 50);
+    g_signal_connect(quadrado_nao, "draw", G_CALLBACK(desenhar_quadrado_nao), NULL);
+    gtk_fixed_put(GTK_FIXED(fixed), quadrado_nao, 800, 600);
+
+    // Conexão única e correta
+    g_signal_connect(proximo_triagem, "button-press-event", G_CALLBACK(ao_clicar_no_quadrado_2), contexto_triagem);
     return fixed;
 }
 

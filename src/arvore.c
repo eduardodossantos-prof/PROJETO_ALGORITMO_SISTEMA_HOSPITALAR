@@ -48,9 +48,10 @@ Nodoarvore *criar_folha(int prioridade, const char *justificativa) // nao recebe
 
 // Construção da árvore
 
+
 Nodoarvore *construir_arvore(void)
 {
-    // Folhas — resultados finais da triagem
+    // Folhas — resaultados finais da triagemac
     Nodoarvore *f1a = criar_folha(PRIORIDADE_VERMELHA,
                                   "Paciente inconsciente - risco imediato de vida");
 
