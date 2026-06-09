@@ -502,6 +502,8 @@ GtkWidget *criar_tela_triagem(AppState *state)
     // Estado inicial
     gtk_widget_hide(ctx->box_perguntas);
     gtk_widget_hide(ctx->box_resultado);
+    state->box_perguntas_ref = ctx->box_perguntas;
+    state->box_resultado_ref = ctx->box_resultado;
 
     return box_raiz;
 }
@@ -892,5 +894,9 @@ void gui_iniciar(AppState *state, int argc, char *argv[])
     gtk_stack_set_visible_child_name(GTK_STACK(state->stack), "tela_inicial");
 
     gtk_widget_show_all(window);
+    if (state->box_perguntas_ref)
+        gtk_widget_hide(state->box_perguntas_ref);
+    if (state->box_resultado_ref)
+        gtk_widget_hide(state->box_resultado_ref);
     gtk_main();
 }

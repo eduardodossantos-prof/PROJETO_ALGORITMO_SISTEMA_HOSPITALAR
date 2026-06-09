@@ -20,10 +20,12 @@ typedef struct
     Paciente *paciente;   // paciente sendo triado no momento
 
     // ── Widgets que os callbacks precisam atualizar ───────────────
-    GtkWidget *stack;          // gerencia qual tela está visível
-    GtkWidget *grid_historico; // grade onde os cards do histórico são desenhados
-    GtkWidget *box_chamada;    // onde os cards da fila são desenhados
-    GtkWidget *label_contador; // "NÚMERO DE PACIENTES NA FILA: N"
+    GtkWidget *stack;             // gerencia qual tela está visível
+    GtkWidget *grid_historico;    // grade onde os cards do histórico são desenhados
+    GtkWidget *box_chamada;       // onde os cards da fila são desenhados
+    GtkWidget *label_contador;    // "NÚMERO DE PACIENTES NA FILA: N"
+    GtkWidget *box_perguntas_ref; // referência para esconder após show_all
+    GtkWidget *box_resultado_ref;
 
 } AppState;
 
