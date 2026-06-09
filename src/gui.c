@@ -692,16 +692,31 @@ GtkWidget *criar_tela_inicial(AppState *state)
         GtkWidget *logo = gtk_image_new_from_pixbuf(redim);
         g_object_unref(orig);
         g_object_unref(redim);
-        gtk_widget_set_margin_top(logo, 40);
-        gtk_widget_set_halign(logo, GTK_ALIGN_START);
-        gtk_widget_set_margin_start(logo, 20);
-        gtk_box_pack_end(GTK_BOX(box), logo, FALSE, FALSE, 0);
+
+        // Box horizontal para logo + nomes lado a lado
+        GtkWidget *box_rodape = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 16);
+        gtk_widget_set_margin_top(box_rodape, 40);
+        gtk_widget_set_margin_start(box_rodape, 20);
+        gtk_widget_set_margin_bottom(box_rodape, 10);
+
+        gtk_box_pack_start(GTK_BOX(box_rodape), logo, FALSE, FALSE, 0);
+
+        // Nomes
+        GtkWidget *nomes = gtk_label_new(NULL);
+        gtk_label_set_markup(GTK_LABEL(nomes),
+                             "<span font='Arial 11' foreground='#555555'>"
+                             "Hiago de Oliveira Lima\n"
+                             "Eduardo dos Santos Rodrigues"
+                             "</span>");
+        gtk_widget_set_valign(nomes, GTK_ALIGN_CENTER);
+        gtk_box_pack_start(GTK_BOX(box_rodape), nomes, FALSE, FALSE, 0);
+
+        gtk_box_pack_end(GTK_BOX(box), box_rodape, FALSE, FALSE, 0);
     }
     else
     {
         g_error_free(erro);
     }
-
     return box;
 }
 
